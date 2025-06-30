@@ -44,16 +44,21 @@ public class AmazonTests {
     public void testIsPageAvailable() {
         homePage.getPage();
 
+        /*Sometimes redirects to another version of the page during auto tests.
+        Reloads the page to work with the correct version*/
+        if (!homePage.isPageCorrect()) {
+            if(homePage.getTitle().equals("Amazon.com")) {
+                homePage.notARobot();
+            }
+            else {
+                homePage.refreshPage();
+            }
+        }
+
         Assert.assertNotNull(homePage.getPageUrl(), "Page is not have url");
         Assert.assertTrue(homePage.isUrlContain("www.amazon.com"), "Wrong url");
         Assert.assertEquals(homePage.getTitle(), "Amazon.com. Spend less. Smile more.",
                 "Wrong page title");
-
-        /*Sometimes redirects to another version of the page during auto tests.
-        Reloads the page to work with the correct version*/
-        if (!homePage.isPageCorrect()) {
-            homePage.refreshPage();
-        }
     }
 
     @Test(dependsOnMethods = "testIsPageAvailable")

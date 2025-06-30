@@ -11,6 +11,7 @@ public abstract class BasePage {
     protected final By categorySelector = By.id("searchDropdownBox");
     protected final By searchBar = By.id("twotabsearchtextbox");
     protected final By languageOption = By.id("icp-nav-flyout");
+    protected final By notARobotButton = By.className("a-button-text");
 
     public BasePage(WebDriver webDriver) {
         driver = webDriver;
@@ -62,5 +63,9 @@ public abstract class BasePage {
 
     public void quit() {
         driver.quit();
+    }
+
+    public void notARobot() {
+        driver.findElement(notARobotButton).click();
     }
 }
