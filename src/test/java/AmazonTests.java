@@ -1,9 +1,10 @@
 import Objects.BookPage;
 import Objects.HomePage;
 import Objects.SearchPage;
+import io.qameta.allure.Allure;
+import io.qameta.allure.Description;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.chrome.ChromeOptions;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
@@ -21,11 +22,10 @@ public class AmazonTests {
     Map<String, List<String>> booksData;
 
     @BeforeClass
+    @Description("Web driver configuration")
     public void setUpDriver(){
-        ChromeOptions options = new ChromeOptions();
-        options.addArguments("--headless");
-
-        WebDriver driver = new ChromeDriver(options);
+        Allure.step("Driver created");
+        WebDriver driver = new ChromeDriver();
 
         homePage = new HomePage(driver);
         searchPage = new SearchPage(driver);
@@ -38,6 +38,7 @@ public class AmazonTests {
     }
 
     @Test
+    @Description("Checking whether the driver has been configured correctly")
     public void testIsDriverOk() {
         Assert.assertNotNull(homePage);
         Assert.assertNotNull(searchPage);
@@ -45,9 +46,12 @@ public class AmazonTests {
     }
 
     @Test(dependsOnMethods = "testIsDriverOk")
+    @Description("Are we on the right page")
     public void testIsPageAvailable() {
+        Allure.step("Get page");
         homePage.getPage();
 
+        Allure.step("Checking if you are on the right page");
         /*Sometimes redirects to another version of the page during auto tests.
         Reloads the page to work with the correct version*/
         if (!homePage.isPageCorrect()) {
@@ -66,11 +70,13 @@ public class AmazonTests {
     }
 
     @Test(dependsOnMethods = "testIsPageAvailable")
+    @Description("Correctness of category filter operation")
     public void testIsFilterChange() {
         Assert.assertTrue(homePage.changeFilter("Books"), "Option not found");
     }
 
     @Test(dependsOnMethods = "testIsFilterChange")
+    @Description("Search capability")
     public void testIsSearchWork() {
         homePage.useSearch("Java");
 
@@ -78,11 +84,13 @@ public class AmazonTests {
     }
 
     @Test(dependsOnMethods = "testIsSearchWork")
+    @Description("Pulling book data from a page")
     public void testGetPageItemsData() {
+        Allure.step("Pulling links to books");
         List<String> itemsLinks = searchPage.getPageProductsLinks();
         booksData = new HashMap<>();
 
-
+        Allure.step("Pulling book data from previously pulled links");
         for (String link : itemsLinks) {
             List<String> book = bookPage.getAllBookData(link);
             booksData.put(book.getFirst().substring(11), book);
@@ -101,6 +109,7 @@ public class AmazonTests {
     }
 
     @Test(dependsOnMethods = "testGetPageItemsData")
+    @Description("Whether the book we need is in the list")
     public void testHasCerBook() {
         Assert.assertTrue(booksData.containsKey("Head First Java: A Brain-Friendly Guide"));
         Assert.assertEquals(booksData.get("Head First Java: A Brain-Friendly Guide"),
